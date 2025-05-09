@@ -16,6 +16,8 @@ const songs = [
   { title: "Un Beso", url: "/musica/UnBeso.mp3" },
 ];
 
+const welcomeAudio = "/musica/audioRomeo.mp3";
+
 export default function BirthdayGift() {
   const [giftOpened, setGiftOpened] = useState(false);
   const [letterOpened, setLetterOpened] = useState(false);
@@ -23,7 +25,31 @@ export default function BirthdayGift() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
+  const welcomeAudioRef = useRef(null);
 
+  useEffect(() => {
+    // Verificar si ya se reprodujo el audio de bienvenida
+    const hasPlayedWelcome = localStorage.getItem('hasPlayedWelcome');
+    
+    if (!hasPlayedWelcome) {
+      welcomeAudioRef.current = new Audio(welcomeAudio);
+      welcomeAudioRef.current.play()
+        .then(() => {
+          localStorage.setItem('hasPlayedWelcome', 'true');
+        })
+        .catch(error => {
+          console.error("Error al reproducir audio de bienvenida:", error);
+        });
+    }
+
+    // Limpieza al desmontar el componente
+    return () => {
+      if (welcomeAudioRef.current) {
+        welcomeAudioRef.current.pause();
+        welcomeAudioRef.current = null;
+      }
+    };
+  }, []);
 
   const playSong = () => {
     audioRef.current.play();

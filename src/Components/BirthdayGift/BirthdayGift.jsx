@@ -27,26 +27,27 @@ export default function BirthdayGift() {
   const audioRef = useRef(null);
   const welcomeAudioRef = useRef(null);
 
-  useEffect(() => {
-    // Verificar si ya se reprodujo el audio de bienvenida
-    const hasPlayedWelcome = localStorage.getItem('hasPlayedWelcome');
-    
+  const [hasPlayedWelcome, setHasPlayedWelcome] = useState(false);
+
+   const handleLetterClick = () => {
     if (!hasPlayedWelcome) {
       welcomeAudioRef.current = new Audio(welcomeAudio);
       welcomeAudioRef.current.play()
         .then(() => {
-          localStorage.setItem('hasPlayedWelcome', 'true');
+          setHasPlayedWelcome(true); // Marca como reproducido
         })
         .catch(error => {
-          console.error("Error al reproducir audio de bienvenida:", error);
+          console.error("Error al reproducir:", error);
         });
     }
+    setLetterOpened(true); // Abre la carta
+  };
 
-    // Limpieza al desmontar el componente
+  // Limpieza del audio al desmontar el componente
+  useEffect(() => {
     return () => {
       if (welcomeAudioRef.current) {
         welcomeAudioRef.current.pause();
-        welcomeAudioRef.current = null;
       }
     };
   }, []);
@@ -109,6 +110,7 @@ export default function BirthdayGift() {
 
         <div
         className={`letter-container ${letterOpened ? "opened" : ""}`}
+          onClick={handleLetterClick}
           onMouseEnter={() => 
           setLetterOpened(true)
         }
